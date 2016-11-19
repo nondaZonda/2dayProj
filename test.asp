@@ -5,7 +5,7 @@
     <title>Web Page Demo</title>
 </head>
 <body>
-    <h1>Moja pierwsza strona</h1>
+        <h1>Wyciaganie danych z SQL</h1>
 <%
 
 Dim Conn
@@ -13,15 +13,14 @@ Dim RecordSet
 Dim SQL
 
 //SQL = "SELECT * FROM clients_tb"
-SQL = "DECLARE @string VARCHAR(8000);DECLARE @xml XML;SET @xml = (SELECT * FROM clients_tb FOR XML PATH); SET @string = CONVERT (varchar(8000), @xml); SELECT @string;"
-
+//SQL = "DECLARE @string VARCHAR(8000);DECLARE @xml XML;SET @xml = (SELECT * FROM clients_tb FOR XML PATH); SET @string = CONVERT (varchar(8000), @xml); SELECT @string;"
+SQL = "EXEC getAllData"
 
 Set Conn = Server.CreateObject("ADODB.Connection")
 Set RecordSet = Server.CreateObject("ADODB.Recordset")
 Conn.Open "Provider=SQLOLEDB; Data Source=MASTER\SQLEXPRESS; Initial Catalog=TestDB; User ID=sa; Password=test"
 
 RecordSet.Open SQL,Conn
-Response.write "<br>"
 
 If RecordSet.EOF Then
     Response.Write("No records returned.")
@@ -42,9 +41,6 @@ End If
 '        Recordset.MoveNext
 '    Loop
 'End If
-
-//response.write("Hello !")
-
 
 %>
 </body>
