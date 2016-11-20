@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <title>Sandbox ASP tutorial</title>
     <script>
-        function showCustomer(str) {
+        function showPesel(str) {
             if (str=="") {
                 document.getElementById("txtHint").innerHTML="";
                 return;
@@ -27,7 +27,7 @@
 <body>
 
     <form>
-    <select name="customers" onchange="showCustomer(this.value)">
+    <select name="customers" onchange="showPesel(this.value)">
         <option value="">Wybierz osobę:</option>
     <option value="Daniel">Daniel Kowalski</option>
     <option value="Ayrton">Ayrton Senna</option>
@@ -36,6 +36,7 @@
     </form>
 
     <div id="txtHint">Numer PESEL wyświetli się poniżej...</div>
+    <br/>
 
 </body>
  </html>

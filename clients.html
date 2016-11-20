@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista klientów.</title>
+    <style>
+        html, body{
+            width: 100%;
+            height:100%;
+            margin: 0px;
+            overflow: hidden;
+        }
+    </style>
+
+    <link rel="stylesheet" type="text/css" href="codebase/dhtmlx.css">
+
+    <script src="codebase/dhtmlx.js" type="text/javascript"></script>
+</head>
+<body onload="doOnLoad()">
+
+    <script>
+        // Zamiana znaczników cell1 na cell
+        var fromSQL = "<rows> <row id='1'> <cell12>Daniel</cell12> <cell2>Klowalski</cell2> </row> <row id='2'> <cell1>Jon</cell1> <cell2>Bon Jovi</cell2> </row>";
+        var fromSQL = fromSQL + "<row id='3'> <cell331>Diego Armando</cell331> <cell2>Maradonna</cell2> </row> <row id='4'> <cell1>Ayrton</cell1> <cell2>Senna</cell2> </row> </rows>";
+        var correctSQL = fromSQL.replace(/cell\d*/g,'cell');
+
+        var myLayout;
+        function doOnLoad(){
+            myLayout = new dhtmlXLayoutObject({
+                parent: document.body,
+                pattern: "2E",
+                offsets: {
+                    top: 10,
+                    right: 20,
+                    bottom: 20,
+                    left: 20
+                }
+            });
+
+            var myGrid = myLayout.cells('a').attachGrid();
+            myGrid.setHeader('id,Imię,Nazwisko,Adres,PESEL');
+            myGrid.setColumnIds('id,fname,lname,adress,pesel');
+            myGrid.setColTypes('ro,ro,ro,ro,ro');
+            myGrid.init();
+            //myGrid.load('data/testdata.xml');
+
+            var xmlData = "<rows> <row id='1'> <cell>1</cell> <cell>Daniel</cell> <cell>Klowalski</cell> <cell>Bajkowa 50, 44-500 Gdańsk</cell> <cell>12345678911</cell> </row> </rows>";
+            myGrid.parse(correctSQL);
+        }
+    </script>
+</body>
+</html>
