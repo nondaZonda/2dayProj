@@ -37,9 +37,11 @@
 
             // Incjalizacja Grid'a
             var myGrid = myLayout.cells('a').attachGrid();
-            myGrid.setHeader('Imię,Nazwisko,Adres,PESEL');
-            myGrid.setColumnIds('fname,lname,adress,pesel');
-            myGrid.setColTypes('ro,ro,ro,ro');
+            myGrid.setHeader('Id,Imię,Nazwisko,Adres,PESEL');
+            myGrid.setColumnIds('id,fname,lname,adress,pesel');
+            myGrid.setColTypes('ro,ro,ro,ro,ro');
+            myGrid.setColumnHidden(0, true);
+
             myGrid.init();
 
             // Pobieranie danych z bazy za pomocą AJAX
@@ -56,6 +58,48 @@
             }
             xmlhttp.open("GET","data/get_data.asp",true);
             xmlhttp.send();
+
+            // Inicjalizacja Formularza
+            formStructure = [
+                {type:"settings",position:"label-top"},
+                {type: "fieldset",name:"form1", label: "Formularz", list:[
+                    {type: "input", name: 'id', label: 'Id:', hidden: 'true'},
+                    {type: "input", name: 'fname', label: 'Imię:'},
+                    {type:"input", name:"lname", label:"Nazwisko:"},
+                    {type:"input", name:"adress", label:"Adres:"},
+                    {type:"input", name:"pesel", label:"Nr. PESEL:"},
+                    {type:"newcolumn"},
+                    {type:"button", name:"save", width:130,offsetTop:2, value:"Zapisz"},
+                ]}
+            ];
+            var myForm = myLayout.cells('b').attachForm(formStructure);
+            myForm.bind(myGrid);
+            //var myForm = myLayout.cells('b').attachForm();
+            myForm.attachEvent("onButtonClick", function (btnId) {
+                var id, fname, lname, adress, pesel;
+                id = parseInt(myForm.getItemValue("id"));
+                fname = myForm.getItemValue("fname");
+                lname = myForm.getItemValue("lname");
+                adress = myForm.getItemValue("adress");
+                pesel = parseInt(myForm.getItemValue("pesel"));
+                if (btnId == "save"){
+                    console.log(id + " " + fname + " " + lname + " " + adress + " " + " " + pesel);
+                    if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+                        xmlhttp=new XMLHttpRequest();
+                    } else {// code for IE6, IE5
+                        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+                    }
+                    xmlhttp.onreadystatechange=function() {
+                        if (this.readyState==4 && this.status==200) {
+                            console.log('odpowiedz z serwera: ' + this.responseText);
+                        }
+                    }
+                    xmlhttp.open("POST", "data/save_data.asp", true);
+                    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    xmlhttp.send("id=" + id + "&fname=" + encodeURI(fname) + "&lname=" + encodeURI(lname) + "&adress=" + encodeURI(adress) + "&pesel=" + pesel );
+                }
+            })
+
 
 
         }
