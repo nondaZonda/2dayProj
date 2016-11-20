@@ -1,0 +1,41 @@
+ <!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <title>Sandbox ASP tutorial</title>
+    <script>
+        function showCustomer(str) {
+            if (str=="") {
+                document.getElementById("txtHint").innerHTML="";
+                return;
+            }
+            if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp=new XMLHttpRequest();
+            } else {// code for IE6, IE5
+                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.onreadystatechange=function() {
+                if (this.readyState==4 && this.status==200) {
+                    document.getElementById("txtHint").innerHTML=this.responseText;
+                }
+            }
+            xmlhttp.open("GET","get_ajax.asp?q="+str,true);
+            xmlhttp.send();
+        }
+    </script>
+</head>
+<body>
+
+    <form>
+    <select name="customers" onchange="showCustomer(this.value)">
+        <option value="">Wybierz osobę:</option>
+    <option value="Daniel">Daniel Kowalski</option>
+    <option value="Ayrton">Ayrton Senna</option>
+        <option value="Nikola">Nikola Tesla</option>
+    </select>
+    </form>
+
+    <div id="txtHint">Numer PESEL wyświetli się poniżej...</div>
+
+</body>
+ </html>
