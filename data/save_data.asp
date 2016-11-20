@@ -22,6 +22,4 @@ conn.Open "Provider=SQLOLEDB; Data Source=MASTER\SQLEXPRESS; Initial Catalog=Tes
 
 recordSet.Open sql,conn
 
-//response.write recordSet.GetString
-
 %>

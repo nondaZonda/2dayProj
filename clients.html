@@ -11,21 +11,23 @@
             overflow: hidden;
         }
     </style>
-    <link rel="stylesheet" type="text/css" href="codebase/dhtmlx.css">
-    <script src="codebase/dhtmlx.js" type="text/javascript"></script>
 
+    <link rel="stylesheet" type="text/css" href="codebase/dhtmlxlayout.css">
+    <link rel="stylesheet" type="text/css" href="codebase/dhtmlxgrid.css">
+    <link rel="stylesheet" type="text/css" href="codebase/dhtmlxform.css">
+
+    <script src="codebase/dhtmlxlayout.js" type="text/javascript"></script>
+    <script src="codebase/dhtmlxgrid.js" type="text/javascript"></script>
+    <script src="codebase/dhtmlxform.js" type="text/javascript"></script>
+    <script src="codebase/datastore.js" type="text/javascript"></script>
 </head>
 <body onload="doOnLoad()">
 
     <script>
-        var myLayout;
-        var myGrid;
-        var myForm;
-
         function doOnLoad(){
 
             // Inicjalizacja Layout'u
-            myLayout = new dhtmlXLayoutObject({
+            var myLayout = new dhtmlXLayoutObject({
                 parent: document.body,
                 pattern: "2E",
                 offsets: {
@@ -33,14 +35,25 @@
                     right: 20,
                     bottom: 20,
                     left: 20
-                }
+                },
+                cells: [
+                    {
+                        id: "a",
+                        text: "Dane klientów",
+                    },
+                    {
+                        id: "b",
+                        text: "Edycja rekordów",
+                    },
+                ],
             });
 
             // Incjalizacja Grid'a
-            myGrid = myLayout.cells('a').attachGrid();
+            var myGrid = myLayout.cells('a').attachGrid();
             myGrid.setHeader('Id,Imię,Nazwisko,Adres,PESEL');
             myGrid.setColumnIds('id,fname,lname,adress,pesel');
             myGrid.setColTypes('ro,ro,ro,ro,ro');
+            myGrid.setColSorting('int,str,str,,int');
             myGrid.setColumnHidden(0, true);
 
             myGrid.init();
@@ -49,17 +62,17 @@
             // Inicjalizacja Formularza
             formStructure = [
                 {type:"settings",position:"label-top"},
-                {type: "fieldset",name:"form1", label: "Formularz", list:[
-                    {type: "input", name: 'id', label: 'Id:', hidden: 'true'},
-                    {type: "input", name: 'fname', label: 'Imię:'},
-                    {type:"input", name:"lname", label:"Nazwisko:"},
-                    {type:"input", name:"adress", label:"Adres:"},
-                    {type:"input", name:"pesel", label:"Nr. PESEL:"},
-                    {type:"newcolumn"},
+                {type: "fieldset",name:"form1", label: "Wybierz rekord:", list:[
+                    {type: "input", name: "id", label: "Id:", hidden: "true"},
+                    {type: "input", name: "fname", label: "Imię:", required: "true", validate: "[A-Z][-a-zA-Z]+$"},
+                    {type:"input", name:"lname", label:"Nazwisko:", required: "true", validate: "[A-Z][-a-zA-Z]+$"},
+                    {type:"input", name:"adress", label:"Adres:", required: "true", validate: "[a-zA-Z0-9_.-]*"},
+                    {type:"input", name:"pesel", label:"Nr. PESEL:", required: "true", validate: "^[0-9]*$"},
                     {type:"button", name:"save", width:130,offsetTop:2, value:"Zapisz"},
                 ]}
             ];
-            myForm = myLayout.cells('b').attachForm(formStructure);
+            var myForm = myLayout.cells('b').attachForm(formStructure);
+            //myForm.enableLiveValidation(true);
             myForm.bind(myGrid);
 
             // Obsługa wydarzenia onClick Zapisz w formularzu
@@ -72,25 +85,29 @@
                 pesel = parseInt(myForm.getItemValue("pesel"));
                 if (btnId == "save"){
                     //console.log(id + " " + fname + " " + lname + " " + adress + " " + " " + pesel);
-                    if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
-                        xmlhttp=new XMLHttpRequest();
-                    } else {// code for IE6, IE5
-                        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-                    }
-                    xmlhttp.onreadystatechange=function() {
-                        if (this.readyState==4 && this.status==200) {
-                            //console.log('odpowiedz z serwera: ' + this.responseText);
-                            myGrid.clearAll();
-                            loadData(myGrid);
+                    console.log(myForm.validate());
+                    if (myForm.validate()){
+                        if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+                            xmlhttp = new XMLHttpRequest();
+                        } else {// code for IE6, IE5
+                            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
                         }
+                        xmlhttp.onreadystatechange = function () {
+                            if (this.readyState == 4 && this.status == 200) {
+                                //console.log('odpowiedz z serwera: ' + this.responseText);
+                                myGrid.clearAll();
+                                loadData(myGrid);
+                            }
+                        }
+                        xmlhttp.open("POST", "data/save_data.asp", true);
+                        xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                        xmlhttp.send("id=" + id + "&fname=" + encodeURI(fname) + "&lname=" + encodeURI(lname) + "&adress=" + encodeURI(adress) + "&pesel=" + pesel);
                     }
-                    xmlhttp.open("POST", "data/save_data.asp", true);
-                    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                    xmlhttp.send("id=" + id + "&fname=" + encodeURI(fname) + "&lname=" + encodeURI(lname) + "&adress=" + encodeURI(adress) + "&pesel=" + pesel );
                 }
             })
 
         }
+
 
         /**
          * Laduje do grida dane przy uzyciu AJAX'a
